@@ -1,20 +1,77 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# interactive-persona-editor
 
-# Run and deploy your AI Studio app
+AIの力を活用して、インタラクティブにキャラクター（ペルソナ）を作成、編集、テストできるWebアプリケーションです。
+簡単なトピック、テキストファイル、あるいはAIとの対話を通じて、魅力的なキャラクターをゼロから生み出すことができます。
 
-This contains everything you need to run your app locally.
+## 主な機能
 
-View your app in AI Studio: https://ai.studio/apps/drive/1OnBar6zKvCsVk__U76PZyugi6RAqc5_7
+### 1. AIによるペルソナ生成
 
-## Run Locally
+- **トピックからの生成**: 入力されたトピック（例：「江戸時代の寡黙な侍」）に基づいて、Google検索を活用し、AIが自動でペルソナの基本設定を生成します。
+- **AIチャットによる生成**: AIと対話しながら、ステップバイステップでキャラクターの詳細を固めていくことができます。
+- **ファイルからの抽出**: キャラクター設定が書かれた`.txt`ファイルをアップロードするだけで、AIが各パラメータを自動で抽出します。
 
-**Prerequisites:**  Node.js
+### 2. AI支援による編集機能
 
+- **パラメータとサマリーの双方向同期**: 詳細なパラメータから要約文を生成したり、逆に要約文から各パラメータを更新したりできます。
+- **変更履歴の自動要約**: ペルソナを保存するたびに、AIが変更点を要約し、バージョン履歴として記録します。過去のバージョンにいつでも戻すことが可能です。
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### 3. ペルソナのテストと対話
+
+- **テストチャット機能**: 作成したペルソナになりきってAIが応答するテストチャットで、キャラクターの言動を確認できます。
+- **本番チャットモード**: 複数のペルソナを切り替えながら、より実践的な対話シミュレーションが可能です。
+
+### 4. 音声入出力
+
+- **テキスト読み上げ（TTS）**: Fish Audio APIと連携し、登録したカスタムボイスでペルソナの返答を音声再生します。
+- **音声認識（STT）**: マイク入力に対応しており、声でメッセージを送信できます。
+
+---
+
+## 利用方法
+
+### 1. APIキーの設定
+
+このアプリケーションを動作させるには、Google Gemini APIのキーが必要です。
+
+1.  `services/geminiService.ts` ファイルを開きます。
+2.  ファイル内の `const API_KEY = "YOUR_API_KEY_HERE";` という行を見つけます。
+3.  `YOUR_API_KEY_HERE` の部分を、あなたの有効なGoogle Gemini APIキーに置き換えてください。
+
+### 2. 音声読み上げ機能（任意）の設定
+
+音声読み上げ機能は、[Fish Audio API](https://fish.audio/)を利用しています。
+セキュリティとCORS（Cross-Origin Resource Sharing）制限を回避するため、本アプリケーションでは `api/tts.ts` というサーバーレス関数をプロキシとして使用しています。
+
+- この機能を利用するには、`api/tts.ts` をVercelやNetlifyなどのサーバーレス関数をホストできる環境にデプロイする必要があります。
+- アプリ内の「Chat」ビューにある歯車アイコンから「Manage Voices」を開き、Fish Audioで取得した `Token` と `Voice ID` を登録することで、カスタムボイスが利用可能になります。
+
+### 3. アプリケーションの起動
+
+必要な設定が完了したら、`index.html`をウェブサーバーでホストするか、ローカル環境で開いてください。
+音声読み上げ機能（TTS）を利用する場合は、前述の通りサーバーレス関数が正しく動作する環境へのデプロイが必要です。
+
+---
+
+## 主要技術
+
+-   **Frontend**: React, TypeScript, Tailwind CSS
+-   **AI Model**: Google Gemini API (`@google/genai`)
+-   **Text-to-Speech (TTS)**: Fish Audio API
+-   **Speech-to-Text (STT)**: Web Speech API
+
+---
+
+## ファイル構成
+
+-   `index.html`: アプリケーションのエントリーポイント
+-   `index.tsx`: Reactアプリケーションのマウントポイント
+-   `App.tsx`: 全体のレイアウトと状態を管理するメインコンポーネント
+-   `components/`: UIコンポーネント
+    -   `PersonaEditorModal.tsx`: ペルソナの作成・編集を行うコア機能を持つモーダル
+    -   `ProductionChat.tsx`: ペルソナと対話するチャットインターフェース
+    -   `VoiceManagerModal.tsx`: TTS用のカスタムボイスを管理するモーダル
+    -   `PersonaList.tsx`: 作成されたペルソナの一覧を表示
+-   `services/geminiService.ts`: Google Gemini APIとの通信ロジック
+-   `api/tts.ts`: Fish Audio APIへのプロキシとして機能するサーバーレス関数
+-   `types.ts`: アプリケーション全体で使用するTypeScriptの型定義
